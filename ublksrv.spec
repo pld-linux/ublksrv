@@ -1,19 +1,19 @@
 #
 # Conditional build:
-%bcond_without	static_libs	# static libraries
+%bcond_without	static_libs	# static library
 %bcond_without	tools		# ublk tool
 #
 Summary:	Uesrspace block driver (ublk)
 Summary(pl.UTF-8):	Sterownik urządzeń blokowych w przestrzeni użytkownika (ublk)
-Name:		ubdsrv
-Version:	1.0
+Name:		ublksrv
+Version:	1.1
 Release:	1
 License:	LGPL v2 or MIT (library), GPL v2 or MIT (tool), GPL v2 (qcow2 target)
 Group:		Libraries
-#Source0Download: https://github.com/ming1/ubdsrv/releases
-Source0:	https://github.com/ming1/ubdsrv/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	0f19b097a2f86a2a9ae650e3a0c4adc0
-URL:		https://github.com/ming1/ubdsrv
+#Source0Download: https://github.com/ublk-org/ublksrv/tags
+Source0:	https://github.com/ublk-org/ublksrv/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	400e232deead56e5c16099a628eb06d3
+URL:		https://github.com/ublk-org/ublksrv
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 BuildRequires:	libstdc++-devel >= 6:4.7
@@ -23,6 +23,7 @@ BuildRequires:	libtool >= 2:2
 BuildRequires:	liburing-devel >= 2.2
 BuildRequires:	pkgconfig
 Requires:	%{name}-libs = %{version}-%{release}
+Obsoletes:	ubdsrv < 1.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -37,6 +38,7 @@ Summary:	ublk server library
 Summary(pl.UTF-8):	Biblioteka serwera ublk
 Group:		Libraries
 Requires:	liburing >= 2.2
+Obsoletes:	ubdsrv-libs < 1.1
 
 %description libs
 ublk server library.
@@ -50,6 +52,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki ublksrv
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	liburing-devel >= 2.2
+Obsoletes:	ubdsrv-devel < 1.1
 
 %description devel
 Header files for ublksrv library.
@@ -62,6 +65,7 @@ Summary:	Static ublksrv library
 Summary(pl.UTF-8):	Statyczna biblioteka ublksrv
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+Obsoletes:	ubdsrv-static < 1.1
 
 %description static
 Static ublksrv library.
@@ -72,6 +76,8 @@ Statyczna biblioteka ublksrv.
 %prep
 %setup -q
 
+%{__sed} -i -e 's,/usr/bin/chown,/bin/chown,' utils/ublk_chown*.sh
+
 %build
 %{__libtoolize}
 %{__aclocal} -I m4
@@ -79,6 +85,7 @@ Statyczna biblioteka ublksrv.
 %{__autoheader}
 %{__automake}
 %configure \
+	--disable-silent-rules \
 	%{!?with_static_libs:--disable-static}
 
 %{__make} %{!?with_tools:-C lib}
@@ -100,6 +107,9 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 %endif
 
+# what is the use case?
+%{__rm} $RPM_BUILD_ROOT%{_sbindir}/ublk_chown_docker.sh
+
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 
@@ -114,6 +124,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc doc/ublk_intro.pdf
 %attr(755,root,root) %{_sbindir}/ublk
+%attr(755,root,root) %{_sbindir}/ublk_chown.sh
+%attr(755,root,root) %{_sbindir}/ublk_user_id
 %endif
 
 %files libs
