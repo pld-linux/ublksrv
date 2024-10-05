@@ -6,16 +6,18 @@
 Summary:	Uesrspace block driver (ublk)
 Summary(pl.UTF-8):	Sterownik urządzeń blokowych w przestrzeni użytkownika (ublk)
 Name:		ublksrv
-Version:	1.1
+Version:	1.2
 Release:	1
 License:	LGPL v2 or MIT (library), GPL v2 or MIT (tool), GPL v2 (qcow2 target)
 Group:		Libraries
 #Source0Download: https://github.com/ublk-org/ublksrv/tags
 Source0:	https://github.com/ublk-org/ublksrv/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	400e232deead56e5c16099a628eb06d3
+# Source0-md5:	54d59c4dfbc2c01850a395b2956d5fbd
 URL:		https://github.com/ublk-org/ublksrv
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
+# for nbd client
+BuildRequires:	gnutls-devel >= 2.12.0
 BuildRequires:	libstdc++-devel >= 6:4.7
 # -std=c++20 -fcoroutines
 %{?with_tools:BuildRequires:	libstdc++-devel >= 6:10}
